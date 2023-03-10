@@ -43,6 +43,7 @@ class MiniGridEnv(gym.Env):
         highlight: bool = True,
         tile_size: int = TILE_PIXELS,
         agent_pov: bool = False,
+        can_carry_multiple_items: bool = False,
     ):
         # Initialize mission
         self.mission = mission_space.sample()
@@ -103,7 +104,11 @@ class MiniGridEnv(gym.Env):
 
         # Current grid and mission and carrying
         self.grid = Grid(width, height)
-        self.carrying = None
+        self.can_carry_multiple_items = can_carry_multiple_items
+        if self.can_carry_multiple_items:
+            self.carrying = []
+        else:
+            self.carrying = None
 
         # Rendering attributes
         self.render_mode = render_mode
@@ -138,7 +143,10 @@ class MiniGridEnv(gym.Env):
         assert start_cell is None or start_cell.can_overlap()
 
         # Item picked up, being carried, initially nothing
-        self.carrying = None
+        if self.can_carry_multiple_items:
+            self.carrying = []
+        else:
+            self.carrying = None
 
         # Step count since episode start
         self.step_count = 0
@@ -547,17 +555,25 @@ class MiniGridEnv(gym.Env):
         # Pick up an object
         elif action == self.actions.pickup:
             if fwd_cell and fwd_cell.can_pickup():
-                if self.carrying is None:
+                if self.can_carry_multiple_items:
+                    fwd_cell.cur_pos = np.array([-1, -1])
+                    self.carrying.append(fwd_cell)
+                elif self.carrying is None:
+                    fwd_cell.cur_pos = np.array([-1, -1])
                     self.carrying = fwd_cell
-                    self.carrying.cur_pos = np.array([-1, -1])
-                    self.grid.set(fwd_pos[0], fwd_pos[1], None)
+                self.grid.set(fwd_pos[0], fwd_pos[1], None)
 
         # Drop an object
         elif action == self.actions.drop:
             if not fwd_cell and self.carrying:
-                self.grid.set(fwd_pos[0], fwd_pos[1], self.carrying)
-                self.carrying.cur_pos = fwd_pos
-                self.carrying = None
+                if self.can_carry_multiple_items:
+                    self.grid.set(fwd_pos[0], fwd_pos[1], self.carrying[-1])
+                    self.carrying[-1].cur_pos = fwd_pos
+                    self.carrying.pop()
+                else:
+                    self.grid.set(fwd_pos[0], fwd_pos[1], self.carrying)
+                    self.carrying.cur_pos = fwd_pos
+                    self.carrying = None
 
         # Toggle/activate an object
         elif action == self.actions.toggle:
@@ -611,7 +627,7 @@ class MiniGridEnv(gym.Env):
         # We do this by placing the carried object at the agent's position
         # in the agent's partially observable view
         agent_pos = grid.width // 2, grid.height - 1
-        if self.carrying:
+        if self.carrying and not self.can_carry_multiple_items:
             grid.set(*agent_pos, self.carrying)
         else:
             grid.set(*agent_pos, None)
