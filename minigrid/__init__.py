@@ -366,6 +366,34 @@ def register_minigrid_envs():
         kwargs={"size": 7},
     )
 
+
+    # MultiKey
+    # ----------------------------------------
+
+    register(
+        id="MiniGrid-MultiKey-K1-Ordered-16x16-v0",
+        entry_point="minigrid.envs:MultiKeyEnv",
+        kwargs={"size": 16, "num_keys": 1, "ordered": True},
+    )
+
+    register(
+        id="MiniGrid-MultiKey-K2-Ordered-16x16-v0",
+        entry_point="minigrid.envs:MultiKeyEnv",
+        kwargs={"size": 16, "num_keys": 2, "ordered": True},
+    )
+
+    register(
+        id="MiniGrid-MultiKey-K3-Ordered-16x16-v0",
+        entry_point="minigrid.envs:MultiKeyEnv",
+        kwargs={"size": 16, "num_keys": 3, "ordered": True},
+    )
+
+    register(
+        id="MiniGrid-MultiKey-K4-Ordered-16x16-v0",
+        entry_point="minigrid.envs:MultiKeyEnv",
+        kwargs={"size": 16, "num_keys": 4, "ordered": True},
+    )
+
     # MultiRoom
     # ----------------------------------------
 
