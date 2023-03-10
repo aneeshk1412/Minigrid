@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from minigrid.core.actions import Actions
 
 TILE_PIXELS = 32
 
@@ -56,3 +57,22 @@ DIR_TO_VEC = [
     # Up (negative Y)
     np.array((0, -1)),
 ]
+
+ACT_SET = {
+    "left",
+    "right",
+    "forward",
+    "toggle",
+    "pickup",
+    "drop",
+}
+
+ACT_STR_TO_ENUM = {
+    "left": Actions.left,
+    "right": Actions.right,
+    "forward": Actions.forward,
+    "toggle": Actions.toggle,
+    "pickup": Actions.pickup,
+    "drop": Actions.drop,
+    "done": Actions.done,
+}
