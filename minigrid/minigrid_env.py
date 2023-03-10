@@ -119,10 +119,23 @@ class MiniGridEnv(gym.Env):
     def reset(
         self,
         *,
+        soft: bool = False,
+        max_steps: int | None = None,
         seed: int | None = None,
         options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
         super().reset(seed=seed)
+
+        if soft:
+            # Step count since episode start
+            self.step_count = 0
+            # Reset max steps if given
+            if max_steps is not None:
+                self.max_steps = max_steps
+
+            # Return first observation
+            obs = self.gen_obs()
+            return obs, {}
 
         # Reinitialize episode-specific variables
         self.agent_pos = (-1, -1)
