@@ -172,6 +172,9 @@ class MiniGridEnv(gym.Env):
 
         return obs, {}
 
+    def identifier(self) -> int:
+        return int.from_bytes(self.__str__().encode(), 'little')
+
     def hash(self, size=16):
         """Compute a hash that uniquely identifies the current state of the environment.
         :param size: Size of the hashing
